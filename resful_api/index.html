@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết bị hệ thống</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-2">
+        <div class="row">
+            <div class="col-2">
+                <select class="form-select" id="select" onchange="search(value)">
+                </select>
+            </div>
+            <div class="col">
+                <form id="add">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="name" placeholder="Nhập tên">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-success">Thêm</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col" style="width: 80%">Tên thiết bị</th>
+                            <th scope="col">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+    crossorigin="anonymous"></script>
+<script>
+    function getList(option) {
+        $.ajax({
+            url: '/api/list'
+        }).done(rs => {
+            var row = ''
+            if (option == 'select') {
+                row += '<option value="">Chọn</option>'
+                rs.data.forEach(e => {
+                    row += '<option value=' + e.id + '>' + e.name + '</option>'
+                })
+
+                $("#select").html(row)
+            }
+
+            if (option == 'table') {
+                rs.data.forEach(element => {
+                    row += '<tr>'
+                    row += '<td scope="row">' + element.id + '</td>'
+                    row += '<td><p id="p_' + element.id + '"> ' + element.name + '</p><input type="text" value="' + element.name + '" class="hide form-control" id="input_' + element.id + '"></td>'
+                    row += '<td><button type="button" id="edit_' + element.id + '" class="btn btn-primary" onclick="edit(' + element.id + ')">Sửa</button><button type="button" id="done_' + element.id + '" class="hide btn btn-success" onclick="done(' + element.id + ')">Xong</button><button type="button" class="btn btn-danger" onclick="remove(' + element.id + ')">Xoá</button></td>'
+                    row += '</tr>'
+                });
+                $("#data").html(row)
+            }
+        })
+    }
+
+    getList("select")
+    getList("table")
+    function edit(id) {
+        $("#input_" + id).toggle();
+        $("#p_" + id).toggle();
+        $("#edit_" + id).toggle();
+        $("#done_" + id).toggle();
+    }
+
+    function done(id) {
+        $("#input_" + id).toggle();
+        $("#p_" + id).toggle();
+        $("#edit_" + id).toggle();
+        $("#done_" + id).toggle();
+        let value = $("#input_" + id).val()
+
+        $.ajax({
+            url: '/api/update/' + id,
+            method: "PUT",
+            data: {
+                name: value
+            }
+        }).done(rs => {
+            getList("select")
+            getList("table")
+        })
+    }
+
+    function search(value) {
+        if (value == "") {
+            return getList("table")
+        }
+        $.ajax({
+            url: '/api/search/?id=' + value
+        }).done(rs => {
+            var row = ''
+            rs.data.forEach(element => {
+                row += '<tr>'
+                row += '<td scope="row">' + element.id + '</td>'
+                row += '<td><p id="p_' + element.id + '"> ' + element.name + '</p><input type="text" value="' + element.name + '" class="hide form-control" id="input_' + element.id + '"></td>'
+                row += '<td><button type="button" id="edit_' + element.id + '" class="btn btn-primary" onclick="edit(' + element.id + ')">Sửa</button><button type="button" id="done_' + element.id + '" class="hide btn btn-success" onclick="done(' + element.id + ')">Xong</button></td>'
+                row += '</tr>'
+            });
+            $("#data").html(row)
+        })
+    }
+
+    $("#add").submit(function (event) {
+        event.preventDefault();
+        var name = $("#name").val();
+        $.ajax({
+            url: '/api/add',
+            data: {
+                name: name
+            },
+            method: "POST"
+        }).done(rs => {
+            getList("table")
+        })
+    });
+
+    function remove(id) {
+        $.ajax({
+            url: '/api/delete/' + id,
+            method: "DELETE"
+        }).done(rs => {
+            getList("table")
+        })
+    }
+</script>
+
+</html>
