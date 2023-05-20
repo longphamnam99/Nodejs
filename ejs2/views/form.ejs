@@ -1,0 +1,24 @@
+<form class="form-inline" id="form">
+    <div class="form-group mb-2">
+        <label class="sr-only" name="name" id="name">Tên sản phẩm</label>
+        <input type="text" id="name" name="name">
+    </div>
+    <button type="submit" class="btn btn-primary mb-2">Thêm</button>
+</form>
+<script>
+    $("#form").submit(function (event) {
+        event.preventDefault();
+        $.ajax({
+            method: "post",
+            url: "/add",
+            data: $("#form").serialize()
+        }).done(function (res) {
+            if (res.code != 200) {
+                alert(res.message)
+                return;
+            }
+            $("#data").append("<tr><td>"+res.data.id+"</td><td>"+res.data.name+"</td></tr>")
+            $('#form')[0].reset();
+        });
+    });
+</script>
