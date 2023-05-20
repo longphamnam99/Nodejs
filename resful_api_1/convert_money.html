@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chuyển đổi tiền tệ</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="card p-3">
+      <h1 class="text-center mb-4">Chuyển đổi tiền tệ</h1>
+      <form>
+        <div class="form-group mb-3">
+          <label for="amount">Số tiền</label>
+          <input type="number" class="form-control" id="amount" name="amount" placeholder="Nhập số tiền...">
+        </div>
+        <div class="form-group mb-3">
+          <label for="from">Số tiền cần đổi</label>
+          <select class="form-select" id="from" name="from">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+        <div class="form-group mb-3">
+          <label for="to">Số tiền cần chuyển</label>
+          <select class="form-select" id="to" name="to">
+            <option value="VND">VND</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Chuyển đổi</button>
+        </div>
+      </form>
+      <div class="mt-4" id="result_convert">
+        <h5>Kết quả:</h5>
+        <p id="result"></p>
+      </div>
+      <div class="mt-4" id="error">
+        <h5 class="text-danger">Lỗi:</h5>
+        <p class="text-danger" id="show_error"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script type="text/javascript">
+    $("#result_convert").hide();
+    $("#error").hide();
+
+    $("form").submit((event) => {
+      event.preventDefault();
+      const url = "http://localhost:3000/api/convert_money";
+      const data = {
+        amount: $("#amount").val(),
+        from: $("#from").val(),
+        to: $("#to").val()
+      }
+      $.ajax({
+        url: url,
+        method: "POST",
+        data: data
+      })
+        .done(response => {
+          $("#result_convert").show();
+          $("#result").html(response.data.result + " " + response.data.to);
+          $("#error").hide();
+        })
+        .fail((jqXHR, textStatus, errorThrown) => {
+          $("#error").show();
+          $("#show_error").html(jqXHR.responseJSON.message);
+          $("#result_convert").hide();
+        });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chuyển đổi °F sang °C</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .temp-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 24px;
+        }
+
+        .temp-text {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card p-3">
+            <h1 class="text-center">Chuyển đổi °F sang °C </h1>
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="slider-wrapper">
+                        <input type="range" min="-100" max="300" value="0" id="fahrenheit" class="form-range">
+                    </div>
+                    <div class="temp-wrapper">
+                        <div class="d-flex justify-content-center temp-text">
+                            0°F
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script>
+        // Lấy đối tượng slider và hiển thị nhiệt độ F
+        const slider = $("#fahrenheit");
+        const temp = $(".temp-text");
+
+        // Hiển thị giá trị ban đầu của nhiệt độ F
+        temp.text(slider.val() + "°F");
+
+        // Xử lý sự kiện khi slider thay đổi giá trị
+        slider.on("input", () => {
+            // Lấy giá trị hiện tại của slider
+            let fahrenheit = slider.val();
+
+            // Tính toán nhiệt độ Celsius
+            let celsius = (fahrenheit - 32) * 5 / 9;
+
+            // Hiển thị giá trị nhiệt độ Celsius
+            temp.text(fahrenheit + "°F ~ " + celsius.toFixed(1) + "°C");
+        });
+    </script>
+</body>
+
+</html>
