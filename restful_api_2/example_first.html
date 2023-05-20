@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example first</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row pt-2">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="submit">
+                            <div class="form-group">
+                                <label for="length">Chiều dài</label>
+                                <input type="number" class="form-control" id="length"
+                                    placeholder="Nhập chiều dài hình chữ nhật">
+                            </div>
+                            <div class="form-group">
+                                <label for="width">Chiều rộng</label>
+                                <input type="number" class="form-control" id="width"
+                                    placeholder="Nhập chiều rộng hình chữ nhật">
+                            </div>
+                            <div class="form-group">
+                                <label for="request">Request</label>
+                                <br>
+                                <select class="form-select form-select-lg mb-3" id="request">
+                                    <option selected>Request</option>
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                    <option value="DELETE">DELETE</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="result">
+                                <label for="result">Kết quả diện tích hình chữ nhật: <b id="result_value"></b></label>
+                            </div>
+                            <div class="form-group" id="error">
+                                <label for="error">Kết quả bị lỗi: <b id="result_error" class="text-danger"></b></label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM="
+    crossorigin="anonymous"></script>
+<script type="text/javascript">
+    $("#result").hide();
+    $("#error").hide();
+    let request = null;
+    $("#request").change(() => {
+        request = $("#request").val();
+    });
+    $("#submit").submit(function (event) {
+        event.preventDefault();
+        const length = $("#length").val();
+        const width = $("#width").val();
+        if (length < 1 || width < 1) {
+            alert("Giá trị không hợp lệ");
+            return;
+        }
+        if (request === null) {
+            alert("Vui lòng chọn request");
+            return;
+        }
+
+        callAjax = (method, query = null, data = null) => {
+            let url = "http://localhost:5562/api/example_first/rectangular_area";
+            if (query) url += "?" + query;
+
+            $.ajax({
+                url: url,
+                method: method,
+                data: data
+            })
+                .done(data => {
+                    $("#result").show();
+                    $("#result_value").html(data.data);
+                    $("#error").hide();
+                })
+                .fail((jqXHR, textStatus, errorThrown) => {
+                    $("#error").show();
+                    $("#result_error").html(jqXHR.responseJSON.message);
+                    $("#result").hide();
+                });
+        }
+
+        switch (request) {
+            case "GET":
+                let url = "length=" + length + "&width=" + width;
+                callAjax(request, url);
+                break;
+            case "POST":
+                callAjax(request, null, { length: length, width: width });
+                break;
+            case "PUT":
+                callAjax(request, null, { length: length, width: width });
+                break;
+            case "DELETE":
+                callAjax(request, null, { length: length, width: width });
+                break;
+        }
+    });
+</script>
+
+</html>
